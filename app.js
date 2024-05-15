@@ -14,7 +14,7 @@ app.post('/reset', (req, res) => {
 app.get('/balance', (req, res) => {
     const { account_id } = req.query;
     if (accounts[account_id]) {
-        res.json({ balance: accounts[account_id].balance });
+        res.send(accounts[account_id].balance.toString()); // Return balance as string
     } else {
         res.status(404).send('0');
     }
@@ -26,7 +26,7 @@ app.post('/event', (req, res) => {
     switch (type) {
         case 'deposit':
             if (!accounts[destination]) {
-                accounts[destination] = { balance: 0 }; // Create  account
+                accounts[destination] = { balance: 0 }; // Create account
             }
             accounts[destination].balance += amount;
             res.status(201).json({ destination: { id: destination, balance: accounts[destination].balance } });
@@ -40,11 +40,11 @@ app.post('/event', (req, res) => {
             }
             break;
         case 'transfer':
-            if (!accounts[origin] || accounts[origin].balance < amount || !accounts[destination]) {
+            if (!accounts[origin] || accounts[origin].balance < amount) {
                 res.status(404).send('0');
             } else {
                 if (!accounts[destination]) {
-                    accounts[destination] = { balance: 0 }; // Create account
+                    accounts[destination] = { balance: 0 }; // Create account if not exist
                 }
                 accounts[origin].balance -= amount;
                 accounts[destination].balance += amount;
